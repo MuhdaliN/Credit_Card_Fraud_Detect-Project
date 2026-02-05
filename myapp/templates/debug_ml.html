@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ML Model Debug</title>
+</head>
+<body>
+    <h1>ML Model Status</h1>
+    <p><strong>ML Models Loaded:</strong> {{ ml_models_loaded }}</p>
+    <p><strong>Model Path:</strong> {{ model_path }}</p>
+    <p><strong>Model Exists:</strong> {{ model_exists }}</p>
+    <p><strong>Scaler Path:</strong> {{ scaler_path }}</p>
+    <p><strong>Scaler Exists:</strong> {{ scaler_exists }}</p>
+    <p><strong>Model Directory:</strong> {{ model_dir }}</p>
+    <h3>Files in Directory:</h3>
+    <ul>
+        {% for file in files_in_dir %}
+        <li>{{ file }}</li>
+        {% empty %}
+        <li>No files found</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

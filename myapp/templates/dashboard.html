@@ -1,0 +1,707 @@
+<!-- dashboard.html - Fixed version -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Card Fraud Detection Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background: rgba(15, 23, 42, 0.9);
+            border-bottom: 1px solid #334155;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #60a5fa;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+
+        .nav {
+            display: flex;
+            background: rgba(30, 41, 59, 0.8);
+            padding: 0 2rem;
+            border-bottom: 1px solid #475569;
+        }
+
+        .nav-item {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            font-weight: 500;
+            color: #e2e8f0;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-item.active, .nav-item:hover {
+            color: #60a5fa;
+            border-bottom-color: #60a5fa;
+            background: rgba(96, 165, 250, 0.1);
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 1.5rem;
+            padding: 2rem;
+        }
+
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid #475569;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h3 {
+            color: #94a3b8;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .upload-zone {
+            border: 2px dashed #475569;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .upload-zone:hover {
+            border-color: #60a5fa;
+            background: rgba(96, 165, 250, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 2.5rem;
+            color: #60a5fa;
+            margin-bottom: 1rem;
+        }
+
+        .file-info {
+            background: rgba(15, 23, 42, 0.5);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border-left: 4px solid #10b981;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: rgba(34, 197, 94, 0.2);
+            color: #34d399;
+            border: 1px solid #34d399;
+        }
+
+        .status-operational {
+            background: rgba(96, 165, 250, 0.2);
+            color: #60a5fa;
+            border: 1px solid #60a5fa;
+        }
+
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.8));
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 1px solid #475569;
+        }
+
+        .metric-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+
+        .metric-high {
+            color: #f87171;
+        }
+
+        .metric-medium {
+            color: #fbbf24;
+        }
+
+        .metric-low {
+            color: #34d399;
+        }
+
+        .transactions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .transactions-table th, .transactions-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #475569;
+        }
+
+        .transactions-table th {
+            color: #94a3b8;
+            font-weight: 600;
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        .transactions-table tr:hover {
+            background: rgba(96, 165, 250, 0.05);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(30, 41, 59, 0.8);
+            color: #e2e8f0;
+            border: 1px solid #475569;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(71, 85, 105, 0.5);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+        }
+
+        .footer {
+            margin-top: 2rem;
+            padding: 1.5rem 2rem;
+            border-top: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.9);
+            color: #94a3b8;
+        }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+
+        .chart-container {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid #475569;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+        }
+
+        .form-upload {
+            display: contents;
+        }
+
+        /* Message styling */
+        .messages {
+            padding: 1rem;
+            margin: 1rem 2rem;
+            border-radius: 8px;
+        }
+        
+        .alert-success {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid #34d399;
+            color: #34d399;
+        }
+        
+        .alert-error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #f87171;
+            color: #f87171;
+        }
+        
+        .alert-info {
+            background: rgba(96, 165, 250, 0.2);
+            border: 1px solid #60a5fa;
+            color: #60a5fa;
+        }
+
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav {
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+        .btn-download {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .btn-download:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">
+            <i class="fas fa-shield-alt"></i> Credit Card Fraud Detect
+        </div>
+        <div class="user-info">
+            <div class="user-avatar">{{ user.name_db|slice:":2"|upper }}</div>
+            <div>
+                <div style="font-weight: 600;">{{ user.name_db }}</div>
+                <div style="font-size: 0.85rem; color: #94a3b8;">{{ user.email_db }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="{% url 'dashboard' %}" class="nav-item active">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a href="{% url 'advanced_analysis' %}" class="nav-item">
+            <i class="fas fa-chart-line"></i> Advanced Analysis
+        </a>
+        <a href="{% url 'faq' %}" class="nav-item">
+            <i class="fas fa-question-circle"></i> FAQ
+        </a>
+        <a href="{% url 'logout' %}" class="nav-item">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+    <!-- Display messages -->
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Left Panel -->
+        <div class="left-panel">
+            <!-- Upload Card -->
+            <div class="card">
+                <h3><i class="fas fa-cloud-upload-alt"></i> Upload Transaction Data</h3>
+                <form method="POST" action="{% url 'upload_csv' %}" enctype="multipart/form-data" id="uploadForm" class="form-upload">
+                    {% csrf_token %}
+                    <div class="upload-zone" id="uploadZone">
+                        <div class="upload-icon">
+                            <i class="fas fa-file-csv"></i>
+                        </div>
+                        <p>Drag & drop your CSV file here</p>
+                        <p style="font-size: 0.9rem; color: #94a3b8; margin-top: 0.5rem;">
+                            Maximum file size: 10MB | Only CSV files allowed
+                        </p>
+                        <input type="file" id="fileInput" name="csv_file" accept=".csv" style="display: none;" required>
+                        <button type="button" class="btn btn-secondary" onclick="document.getElementById('fileInput').click()" style="margin-top: 1rem;">
+                            <i class="fas fa-folder-open"></i> Choose File
+                        </button>
+                    </div>
+                    
+                    {% if csv_file %}
+                    <div class="file-info">
+                        <p style="font-weight: 600; margin-bottom: 0.5rem;">
+                            <i class="fas fa-file"></i> {{ csv_file.original_filename }}
+                        </p>
+                        <p style="font-size: 0.9rem; color: #94a3b8;">
+                            Uploaded {{ csv_file.uploaded_at|timesince }} ago
+                        </p>
+                        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                            <span class="status-badge status-active">
+                                <i class="fas fa-check-circle"></i> File Ready
+                            </span>
+                            {% if ml_models_loaded %}
+                            <span class="status-badge status-operational">
+                                <i class="fas fa-brain"></i> ML Models Loaded
+                            </span>
+                            {% else %}
+                            <span class="status-badge" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b;">
+                                <i class="fas fa-exclamation-triangle"></i> ML Models Not Loaded
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </form>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="card">
+                <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+                {% if csv_file %}
+                <div class="action-buttons">
+                    <form method="POST" action="{% url 'analyze_csv' %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-play"></i> Analyze CSV
+                        </button>
+                    </form>
+                    <a href="{% url 'advanced_analysis' %}" class="btn btn-primary">
+                        <i class="fas fa-brain"></i> Advanced Analysis
+                    </a>
+                    <a href="{% url 'download_analysis_report' %}" class="btn btn-download">
+                        <i class="fas fa-file-download"></i> Download Report
+                    </a>
+                    <form method="POST" action="{% url 'delete_csv' %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?')">
+                            <i class="fas fa-trash"></i> Delete CSV
+                        </button>
+                    </form>
+                </div>
+                {% else %}
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="alert('Please upload a CSV file first')">
+                        <i class="fas fa-play"></i> Analyze CSV
+                    </button>
+                    <button class="btn btn-secondary" onclick="alert('Please upload a CSV file first')">
+                        <i class="fas fa-brain"></i> Advanced Analysis
+                    </button>
+                    <button class="btn btn-secondary" onclick="alert('Please upload a CSV file first')">
+                        <i class="fas fa-file-download"></i> Download Report
+                    </button>
+                    <button class="btn btn-secondary" onclick="alert('No CSV file to delete')">
+                        <i class="fas fa-trash"></i> Delete CSV
+                    </button>
+                </div>
+{% endif %}
+            </div>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="right-panel">
+            <!-- Risk Overview -->
+            <div class="card">
+                <h3><i class="fas fa-exclamation-triangle"></i> Risk Overview</h3>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div style="color: #94a3b8;">System Status</div>
+                        <div class="metric-value {% if ml_models_loaded %}metric-low{% else %}metric-medium{% endif %}">
+                            {% if ml_models_loaded %}Ready{% else %}Loading{% endif %}
+                        </div>
+                        <div style="color: {% if ml_models_loaded %}#34d399{% else %}#fbbf24{% endif %};">
+                            {% if ml_models_loaded %}Models Loaded{% else %}Initializing{% endif %}
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div style="color: #94a3b8;">CSV Status</div>
+                        <div class="metric-value {% if csv_file %}metric-low{% else %}metric-medium{% endif %}">
+                            {% if csv_file %}Uploaded{% else %}Pending{% endif %}
+                        </div>
+                        <div style="color: {% if csv_file %}#34d399{% else %}#fbbf24{% endif %};">
+                            {% if csv_file %}Ready for Analysis{% else %}Upload Required{% endif %}
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div style="color: #94a3b8;">User Account</div>
+                        <div class="metric-value metric-low">Active</div>
+                        <div style="color: #34d399;">Verified</div>
+                    </div>
+                    <div class="metric-card">
+                        <div style="color: #94a3b8;">Last Analysis</div>
+                        <div class="metric-value">
+                            {% if csv_file and csv_file.analysis_result %}
+                            {{ csv_file.analysis_result.analysis_date|date:"M d" }}
+                            {% else %}
+                            Never
+                            {% endif %}
+                        </div>
+                        <div style="color: #94a3b8;">
+                            {% if csv_file and csv_file.analysis_result %}
+                            Analysis Complete
+                            {% else %}
+                            No Analysis Yet
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="card">
+                <h3><i class="fas fa-info-circle"></i> How to Use</h3>
+                <ol style="margin-left: 1.5rem; margin-top: 1rem; line-height: 1.8;">
+                    <li>Upload your bank statement CSV file using the upload zone</li>
+                    <li>Click "Analyze CSV" to run fraud detection analysis</li>
+                    <li>View detailed analysis in the Fraud Analysis section</li>
+                    <li>Download reports for further investigation</li>
+                    <li>Monitor flagged transactions in the analysis results</li>
+                </ol>
+                <p style="margin-top: 1rem; color: #94a3b8; font-size: 0.9rem;">
+                    <i class="fas fa-lightbulb"></i> Tip: Use the sample Book1.csv file to test the system
+                </p>
+            </div>
+
+            <!-- System Info -->
+            <div class="card">
+                <h3><i class="fas fa-server"></i> System Information</h3>
+                <div style="margin-top: 1rem;">
+                    <p><strong>ML Engine:</strong> Random Forest Classifier</p>
+                    <p><strong>Risk Detection:</strong> Heuristic + Machine Learning</p>
+                    <p><strong>Supported Formats:</strong> CSV bank statements</p>
+                    <p><strong>Detection Methods:</strong>
+                        <span class="status-badge" style="background: rgba(34, 197, 94, 0.2); color: #34d399; margin-left: 0.5rem;">Heuristic Rules</span>
+                        <span class="status-badge" style="background: rgba(96, 165, 250, 0.2); color: #60a5fa; margin-left: 0.5rem;">ML Prediction</span>
+                        <span class="status-badge" style="background: rgba(168, 85, 247, 0.2); color: #a855f7; margin-left: 0.5rem;">Pattern Analysis</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Analysis Results Card -->
+{% if csv_file and csv_file.analysis_result %}
+<div class="card">
+    <h3><i class="fas fa-chart-line"></i> Last Analysis Results</h3>
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div style="color: #94a3b8;">Fraud Probability</div>
+            <div class="metric-value 
+                {% if csv_file.analysis_result.fraud_probability >= 0.7 %}metric-high
+                {% elif csv_file.analysis_result.fraud_probability >= 0.4 %}metric-medium
+                {% else %}metric-low{% endif %}">
+                {{ csv_file.analysis_result.fraud_probability|floatformat:1 }}%
+            </div>
+            <div style="color: #94a3b8;">ML Prediction</div>
+        </div>
+        <div class="metric-card">
+            <div style="color: #94a3b8;">High Risk</div>
+            <div class="metric-value metric-high">
+                {{ csv_file.analysis_result.high_risk_count }}
+            </div>
+            <div style="color: #94a3b8;">Transactions</div>
+        </div>
+        <div class="metric-card">
+            <div style="color: #94a3b8;">Amount at Risk</div>
+            <div class="metric-value metric-medium">
+                ${{ csv_file.analysis_result.total_amount_at_risk|floatformat:2 }}
+            </div>
+            <div style="color: #94a3b8;">Total</div>
+        </div>
+        <div class="metric-card">
+            <div style="color: #94a3b8;">Avg Risk Score</div>
+            <div class="metric-value metric-low">
+                {{ csv_file.analysis_result.risk_score|floatformat:1 }}
+            </div>
+            <div style="color: #94a3b8;">/100</div>
+        </div>
+    </div>
+    <div style="margin-top: 1rem;">
+        <a href="{% url 'advanced_analysis' %}" class="btn btn-primary" style="margin-right: 1rem;">
+            <i class="fas fa-chart-bar"></i> View Detailed Analysis
+        </a>
+        <a href="{% url 'download_analysis_report' %}" class="btn btn-download">
+            <i class="fas fa-file-download"></i> Download Report
+        </a>
+    </div>
+</div>
+{% endif %}
+        <!-- After the CSV upload section -->
+
+    <!-- Footer -->
+    <div class="footer">
+        <div>
+    <div style="font-weight: 600; margin-bottom: 0.25rem;">
+        {% if csv_file %}
+        Uploaded file: {{ csv_file.original_filename }}
+        {% else %}
+        No file uploaded yet
+        {% endif %}
+    </div>
+    <div style="font-size: 0.85rem; color: #94a3b8;">
+        {% if csv_file %}
+        {% if csv_file.analysis_result %}
+        Last analyzed: {{ csv_file.analysis_result.analysis_date|date:"M d, Y H:i" }}
+        {% else %}
+        Uploaded {{ csv_file.uploaded_at|timesince }} ago
+        {% endif %}
+        {% else %}
+        Ready for file upload
+        {% endif %}
+    </div>
+</div>
+    </div>
+
+    <script>
+        // Interactive Elements
+        document.getElementById('uploadZone').addEventListener('click', () => {
+            document.getElementById('fileInput').click();
+        });
+
+        // File input change handler
+        document.getElementById('fileInput').addEventListener('change', function() {
+            if (this.files.length > 0) {
+                // Auto-submit the form when file is selected
+                document.getElementById('uploadForm').submit();
+            }
+        });
+
+        // File drag & drop
+        const uploadZone = document.getElementById('uploadZone');
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.style.borderColor = '#60a5fa';
+            uploadZone.style.background = 'rgba(96, 165, 250, 0.1)';
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.style.borderColor = '#475569';
+            uploadZone.style.background = '';
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.style.borderColor = '#10b981';
+            uploadZone.style.background = 'rgba(16, 185, 129, 0.1)';
+            
+            // Get the dropped file
+            const file = e.dataTransfer.files[0];
+            if (file && file.name.toLowerCase().endsWith('.csv')) {
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                document.getElementById('fileInput').files = dataTransfer.files;
+                
+                // Auto-submit the form
+                document.getElementById('uploadForm').submit();
+            } else {
+                alert('Please drop a CSV file only');
+                uploadZone.style.borderColor = '#475569';
+                uploadZone.style.background = '';
+            }
+        });
+
+        // Auto-refresh dashboard every 60 seconds
+        setTimeout(function() {
+            window.location.reload();
+        }, 60000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,456 @@
+<!-- advanced_analysis.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Fraud Analysis - FraudDetect</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+        
+        .glass-card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid #475569;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .navbar-dark {
+            background: rgba(15, 23, 42, 0.9);
+        }
+        
+        .summary-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
+            border: 1px solid #475569;
+            border-radius: 10px;
+            padding: 1.5rem;
+        }
+        
+        .risk-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .risk-high {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .risk-medium {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        
+        .risk-low {
+            background: rgba(34, 197, 94, 0.2);
+            color: #34d399;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+        
+        .chart-box {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 10px;
+            padding: 1rem;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .chart-box img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 8px;
+        }
+        
+        .probability-gauge {
+            height: 25px;
+            background: linear-gradient(90deg, 
+                #34d399 0%, 
+                #fbbf24 50%, 
+                #f87171 100%);
+            border-radius: 12px;
+            margin: 1rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .probability-indicator {
+            position: absolute;
+            top: -5px;
+            width: 4px;
+            height: 35px;
+            background: white;
+            transform: translateX(-50%);
+            border-radius: 2px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'dashboard' %}">
+                <i class="fas fa-shield-alt me-2"></i>FraudDetect
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'dashboard' %}">
+                            <i class="fas fa-home"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'faq' %}">
+                            <i class="fas fa-question-circle"></i> FAQ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="{% url 'logout' %}">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid py-4">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="h2 mb-1 text-white">Advanced Fraud Analysis</h1>
+                        <p class="text-muted mb-0">Analyzing: {{ csv_file.original_filename }}</p>
+                    </div>
+                    <div>
+                        <a href="{% url 'dashboard' %}" class="btn btn-outline-light me-2">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </a>
+                        <a href="{% url 'download_analysis_report' %}" class="btn btn-success">
+                            <i class="fas fa-download"></i> Download Report
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fraud Probability Gauge -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="glass-card p-4">
+                    <h3 class="h4 mb-3 text-white">Fraud Probability Assessment</h3>
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <div class="probability-gauge">
+                                <div class="probability-indicator" style="left: {{ analysis.fraud_probability }}%;"></div>
+                            </div>
+                            <div class="d-flex justify-content-between text-muted small">
+                                <span>0%</span>
+                                <span>50%</span>
+                                <span>100%</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="text-center">
+                                <div class="display-1 fw-bold mb-2 
+                                    {% if analysis.fraud_probability > 50 %}text-danger
+                                    {% elif analysis.fraud_probability > 20 %}text-warning
+                                    {% else %}text-success{% endif %}">
+                                    {{ analysis.fraud_probability|floatformat:1 }}%
+                                </div>
+                                <p class="mb-0">
+                                    {% if analysis.fraud_probability > 50 %}
+                                    <span class="badge bg-danger">HIGH RISK</span>
+                                    {% elif analysis.fraud_probability > 20 %}
+                                    <span class="badge bg-warning">MEDIUM RISK</span>
+                                    {% else %}
+                                    <span class="badge bg-success">LOW RISK</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Statistics -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="summary-card text-center">
+                    <i class="fas fa-exchange-alt fa-2x text-primary mb-3"></i>
+                    <h3 class="h2 fw-bold mb-2">{{ analysis.total_transactions }}</h3>
+                    <p class="text-muted mb-0">Total Transactions</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="summary-card text-center">
+                    <i class="fas fa-exclamation-triangle fa-2x text-warning mb-3"></i>
+                    <h3 class="h2 fw-bold mb-2">{{ analysis.high_risk_count }}</h3>
+                    <p class="text-muted mb-0">High Risk</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="summary-card text-center">
+                    <i class="fas fa-medal fa-2x text-warning mb-3"></i>
+                    <h3 class="h2 fw-bold mb-2">{{ analysis.medium_risk_count }}</h3>
+                    <p class="text-muted mb-0">Medium Risk</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="summary-card text-center">
+                    <i class="fas fa-rupee-sign fa-2x text-danger mb-3"></i>
+                    <h3 class="h2 fw-bold mb-2">₹{{ analysis.total_amount_at_risk|floatformat:2 }}</h3>
+                    <p class="text-muted mb-0">Amount at Risk</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="row mb-4">
+            <div class="col-lg-6 mb-4">
+                <div class="glass-card h-100">
+                    <div class="p-3 border-bottom">
+                        <h5 class="mb-0 text-white"><i class="fas fa-chart-pie me-2"></i>Risk Distribution</h5>
+                    </div>
+                    <div class="p-3">
+                        <div class="chart-box">
+                            <img src="data:image/png;base64,{{ charts.risk_distribution }}" alt="Risk Distribution">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-4">
+                <div class="glass-card h-100">
+                    <div class="p-3 border-bottom">
+                        <h5 class="mb-0 text-white"><i class="fas fa-chart-line me-2"></i>Transaction Timeline</h5>
+                    </div>
+                    <div class="p-3">
+                        <div class="chart-box">
+                            <img src="data:image/png;base64,{{ charts.amount_timeline }}" alt="Transaction Timeline">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-lg-6 mb-4">
+                <div class="glass-card h-100">
+                    <div class="p-3 border-bottom">
+                        <h5 class="mb-0 text-white"><i class="fas fa-clock me-2"></i>Hourly Pattern</h5>
+                    </div>
+                    <div class="p-3">
+                        <div class="chart-box">
+                            <img src="data:image/png;base64,{{ charts.hourly_pattern }}" alt="Hourly Pattern">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-4">
+                <div class="glass-card h-100">
+                    <div class="p-3 border-bottom">
+                        <h5 class="mb-0 text-white"><i class="fas fa-chart-bar me-2"></i>Risk Score Distribution</h5>
+                    </div>
+                    <div class="p-3">
+                        <div class="chart-box">
+                            <img src="data:image/png;base64,{{ charts.risk_histogram }}" alt="Risk Histogram">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risky Transactions Table -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="glass-card">
+                    <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 text-white"><i class="fas fa-exclamation-triangle me-2 text-danger"></i>High Risk Transactions</h5>
+                        <span class="badge bg-danger">{{ analysis.high_risk_count }} transactions</span>
+                    </div>
+                    <div class="p-3">
+                        {% if risky_transactions %}
+                        <div class="table-responsive">
+                            <table class="table table-dark table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Details</th>
+                                        <th>Amount</th>
+                                        <th>Risk Score</th>
+                                        <th>Risk Level</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for transaction in risky_transactions %}
+                                    <tr>
+                                        <td>{{ transaction.Date|date:"Y-m-d" }}</td>
+                                        <td>{{ transaction.Details|truncatechars:50 }}</td>
+                                        <td class="fw-bold">₹{{ transaction.Amount|floatformat:2 }}</td>
+                                        <td>
+                                            <span class="risk-badge 
+                                                {% if transaction.Heuristic_Risk_Score >= 70 %}risk-high
+                                                {% elif transaction.Heuristic_Risk_Score >= 40 %}risk-medium
+                                                {% else %}risk-low{% endif %}">
+                                                {{ transaction.Heuristic_Risk_Score|floatformat:1 }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if transaction.Heuristic_Fraud_Flag == 'HIGH RISK' %}
+                                            <span class="badge bg-danger">HIGH RISK</span>
+                                            {% elif transaction.Heuristic_Fraud_Flag == 'MEDIUM RISK' %}
+                                            <span class="badge bg-warning">MEDIUM RISK</span>
+                                            {% else %}
+                                            <span class="badge bg-success">LOW RISK</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                            <h5 class="text-white">No High Risk Transactions Found</h5>
+                            <p class="text-muted">All transactions appear to be within normal parameters.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis Summary -->
+        <div class="row">
+            <div class="col-12">
+                <div class="glass-card">
+                    <div class="p-3 border-bottom">
+                        <h5 class="mb-0 text-white"><i class="fas fa-file-alt me-2"></i>Analysis Summary</h5>
+                    </div>
+                    <div class="p-4">
+                        <div class="alert 
+                            {% if analysis.fraud_probability > 50 %}alert-danger
+                            {% elif analysis.fraud_probability > 20 %}alert-warning
+                            {% else %}alert-success{% endif %}">
+                            <h4 class="alert-heading">
+                                <i class="fas 
+                                    {% if analysis.fraud_probability > 50 %}fa-exclamation-triangle
+                                    {% elif analysis.fraud_probability > 20 %}fa-exclamation-circle
+                                    {% else %}fa-check-circle{% endif %} me-2"></i>
+                                {% if analysis.fraud_probability > 50 %}
+                                🚨 High Fraud Risk Detected!
+                                {% elif analysis.fraud_probability > 20 %}
+                                ⚠️ Moderate Fraud Risk
+                                {% else %}
+                                ✅ Low Fraud Risk
+                                {% endif %}
+                            </h4>
+                            <p class="mb-2">
+                                The analysis indicates a <strong>{{ analysis.fraud_probability|floatformat:2 }}% probability</strong> 
+                                of fraudulent activity in this account statement.
+                            </p>
+                            <hr>
+                            <p class="mb-0">
+                                <strong>Recommendations:</strong>
+                                {% if analysis.fraud_probability > 50 %}
+                                Immediate review required. Contact account holder and consider temporary account restrictions.
+                                {% elif analysis.fraud_probability > 20 %}
+                                Enhanced monitoring recommended. Verify suspicious transactions with account holder.
+                                {% else %}
+                                Normal monitoring continues. No immediate action required.
+                                {% endif %}
+                            </p>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="text-white mb-3">Key Findings:</h6>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><i class="fas fa-chart-line me-2 text-primary"></i>Average Risk Score: {{ analysis.risk_score|floatformat:1 }}/100</li>
+                                    <li class="mb-2"><i class="fas fa-calendar me-2 text-primary"></i>Analysis Date: {{ analysis.analysis_date|slice:":10" }}</li>
+                                    <li class="mb-2"><i class="fas fa-percentage me-2 text-primary"></i>High Risk Percentage: {{ analysis.high_risk_count|floatformat:0 }}/{{ analysis.total_transactions|floatformat:0 }} transactions</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-white mb-3">Risk Indicators:</h6>
+                                <ul class="list-unstyled">
+                                    {% if analysis.features.pct_high_risk > 10 %}
+                                    <li class="mb-2 text-danger"><i class="fas fa-exclamation-circle me-2"></i>High percentage of risky transactions ({{ analysis.features.pct_high_risk|floatformat:1 }}%)</li>
+                                    {% endif %}
+                                    {% if analysis.features.pct_rapid_txns > 20 %}
+                                    <li class="mb-2 text-danger"><i class="fas fa-bolt me-2"></i>Unusually rapid transactions ({{ analysis.features.pct_rapid_txns|floatformat:1 }}%)</li>
+                                    {% endif %}
+                                    {% if analysis.features.pct_unusual_hours > 30 %}
+                                    <li class="mb-2 text-warning"><i class="fas fa-moon me-2"></i>Transactions during unusual hours ({{ analysis.features.pct_unusual_hours|floatformat:1 }}%)</li>
+                                    {% endif %}
+                                    {% if analysis.features.pct_large_txns > 15 %}
+                                    <li class="mb-2 text-warning"><i class="fas fa-money-bill-wave me-2"></i>Large transaction percentage ({{ analysis.features.pct_large_txns|floatformat:1 }}%)</li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Animate probability gauge
+        document.addEventListener('DOMContentLoaded', function() {
+            const indicator = document.querySelector('.probability-indicator');
+            const fraudProb = {{ analysis.fraud_probability }};
+            
+            // Reset position to 0
+            indicator.style.left = '0%';
+            
+            // Animate to actual position
+            setTimeout(() => {
+                indicator.style.transition = 'left 1.5s ease-in-out';
+                indicator.style.left = fraudProb + '%';
+            }, 300);
+            
+            // Update risk indicators based on values
+            const riskIndicators = document.querySelectorAll('[class*="text-"]');
+            riskIndicators.forEach(indicator => {
+                if (indicator.classList.contains('text-danger')) {
+                    indicator.style.animation = 'pulse 2s infinite';
+                }
+            });
+        });
+        
+        // Add CSS animation for pulsing effect
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { opacity: 1; }
+                50% { opacity: 0.7; }
+                100% { opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Credit Card Fraud Detection</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            color: #764ba2;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #555;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .nav-links .btn {
+            background: #667eea;
+            color: white;
+            padding: 0.6rem 1.5rem;
+        }
+
+        .nav-links .btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .hero {
+            padding: 5rem 5%;
+            text-align: center;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            opacity: 0.9;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-3px);
+        }
+
+        .features {
+            padding: 5rem 5%;
+            background: white;
+            border-radius: 30px 30px 0 0;
+            margin-top: 3rem;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #333;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            border: 1px solid #e9ecef;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card i {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .footer {
+            background: #333;
+            color: white;
+            padding: 3rem 5%;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .footer p {
+            opacity: 0.8;
+            margin-bottom: 1rem;
+        }
+
+        .messages {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-btns {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+         .how-it-works {
+            padding: 5rem 5%;
+            background: #f8f9fa;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .step-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            position: relative;
+            transition: transform 0.3s ease;
+            border: 2px solid #e9ecef;
+        }
+
+        .step-card:hover {
+            transform: translateY(-5px);
+            border-color: #667eea;
+        }
+
+        .step-number {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #667eea;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .testimonials {
+            padding: 5rem 5%;
+            background: white;
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .testimonial-card {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 15px;
+            position: relative;
+            border-left: 4px solid #667eea;
+        }
+
+        .testimonial-card i {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-top: 1rem;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            background: #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .statistics {
+            padding: 5rem 5%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .stat-item {
+            padding: 2rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .demo-video {
+            padding: 5rem 5%;
+            background: white;
+            text-align: center;
+        }
+
+        .video-container {
+            max-width: 800px;
+            margin: 3rem auto;
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 768px) {
+            .steps {
+                grid-template-columns: 1fr;
+            }
+            
+            .testimonial-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-chart-line"></i>
+            <span>Credit Card Fraud Detection</span>
+        </div>
+        <div class="nav-links">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'faq' %}">FAQ</a>
+            {% if request.session.logged_user %}
+                <a href="{% url 'dashboard' %}" class="btn">Dashboard</a>
+                <a href="{% url 'logout' %}" class="btn" style="background: #dc3545;">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn">Login</a>
+                <a href="{% url 'register' %}" class="btn">Register</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %}">
+            <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Credit Card Fraud Detect : Scan and Analyze</h1>
+        <p>Upload your CSV files,Credit Card Fraud Detection with machine learning models, and generate insightful visualizations. All in one powerful platform.</p>
+        <div class="hero-btns">
+            {% if request.session.logged_user %}
+                <a href="{% url 'dashboard' %}" class="btn btn-primary">Go to Dashboard</a>
+            {% else %}
+                <a href="{% url 'register' %}" class="btn btn-primary">Get Started Free</a>
+                <a href="{% url 'login' %}" class="btn btn-secondary">Already have account? Login</a>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <h2>Why Choose Our Platform?</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fas fa-upload"></i>
+                <h3>Easy CSV Upload</h3>
+                <p>Upload your CSV files with ease. Our system automatically validates and processes your data for analysis.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-brain"></i>
+                <h3>ML-Powered Analysis</h3>
+                <p>Leverage pre-trained machine learning models to gain insights from your data without writing code.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-chart-bar"></i>
+                <h3>Beautiful Visualizations</h3>
+                <p>Generate stunning charts and graphs to visualize your data and share insights with your team.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Secure & Private</h3>
+                <p>Your data is encrypted and stored securely. Each user gets their own private workspace.</p>
+            </div>
+        </div>
+    </section>
+    <section class="how-it-works">
+        <div class="container">
+            <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 3rem; color: #333;">
+                How It Works
+            </h2>
+            <div class="steps">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <i class="fas fa-upload fa-3x" style="color: #667eea; margin-bottom: 1.5rem;"></i>
+                    <h3>Upload CSV</h3>
+                    <p>Upload your bank statement CSV file. Our system supports all major bank formats with automatic parsing.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <i class="fas fa-brain fa-3x" style="color: #667eea; margin-bottom: 1.5rem;"></i>
+                    <h3>AI Analysis</h3>
+                    <p>Our advanced ML models analyze transaction patterns, detect anomalies, and identify potential fraud.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <i class="fas fa-chart-line fa-3x" style="color: #667eea; margin-bottom: 1.5rem;"></i>
+                    <h3>Get Insights</h3>
+                    <p>Receive detailed reports with visualizations, risk scores, and actionable recommendations.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section class="statistics">
+        <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Trusted by Thousands</h2>
+        <p style="opacity: 0.9; max-width: 600px; margin: 0 auto;">Join our growing community of users who trust our platform for secure transaction analysis</p>
+        
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-value">10,000+</div>
+                <p>Transactions Analyzed Daily</p>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">99.7%</div>
+                <p>Detection Accuracy</p>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">24/7</div>
+                <p>Real-time Monitoring</p>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">50+</div>
+                <p>Bank Formats Supported</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials">
+        <div class="container">
+            <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 3rem; color: #333;">
+                What Our Users Say
+            </h2>
+            <div class="testimonial-grid">
+                <div class="testimonial-card">
+                    <i class="fas fa-quote-left fa-2x"></i>
+                    <p>"This platform saved our company from a major fraud attempt. The anomaly detection system caught suspicious transactions that our manual review missed."</p>
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div>
+                            <h4>Rajesh Kumar</h4>
+                            <p>Finance Manager, TechCorp</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <i class="fas fa-quote-left fa-2x"></i>
+                    <p>"As a small business owner, I was worried about transaction security. This tool gives me peace of mind with daily monitoring and instant alerts."</p>
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div>
+                            <h4>Priya Sharma</h4>
+                            <p>Small Business Owner</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Video Section -->
+    <section class="demo-video">
+        <h2 style="font-size: 2.5rem; margin-bottom: 1rem; color: #333;">See It In Action</h2>
+        <p style="color: #666; max-width: 600px; margin: 0 auto 2rem;">Watch how our platform transforms raw transaction data into actionable insights</p>
+        
+        <div class="video-container">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 3rem; border-radius: 10px; color: white;">
+                <i class="fas fa-play-circle fa-4x" style="margin-bottom: 1rem;"></i>
+                <h3>Platform Demo</h3>
+                <p>Click to watch a complete walkthrough of our fraud detection system</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Security Features Section -->
+    <section style="padding: 5rem 5%; background: #f8f9fa;">
+        <div class="container">
+            <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 3rem; color: #333;">
+                Enterprise-Grade Security
+            </h2>
+            <div class="features-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem;">
+                <div style="background: white; padding: 2rem; border-radius: 15px; border-left: 4px solid #28a745;">
+                    <i class="fas fa-shield-alt fa-2x" style="color: #28a745; margin-bottom: 1rem;"></i>
+                    <h3>Military-Grade Encryption</h3>
+                    <p>All data is encrypted using AES-256 encryption, ensuring your financial information remains secure.</p>
+                </div>
+                <div style="background: white; padding: 2rem; border-radius: 15px; border-left: 4px solid #17a2b8;">
+                    <i class="fas fa-user-shield fa-2x" style="color: #17a2b8; margin-bottom: 1rem;"></i>
+                    <h3>GDPR Compliant</h3>
+                    <p>We follow strict data privacy regulations and never share your data with third parties.</p>
+                </div>
+                <div style="background: white; padding: 2rem; border-radius: 15px; border-left: 4px solid #ffc107;">
+                    <i class="fas fa-history fa-2x" style="color: #ffc107; margin-bottom: 1rem;"></i>
+                    <h3>Real-time Alerts</h3>
+                    <p>Get instant notifications for suspicious activities through email and SMS alerts.</p>
+                </div>
+                <div style="background: white; padding: 2rem; border-radius: 15px; border-left: 4px solid #dc3545;">
+                    <i class="fas fa-chart-network fa-2x" style="color: #dc3545; margin-bottom: 1rem;"></i>
+                    <h3>Pattern Recognition</h3>
+                    <p>Our AI learns your spending patterns and detects deviations in real-time.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2024 Credit Card Fraud Detection. All rights reserved.</p>
+        <p>Made with <i class="fas fa-heart" style="color: #e74c3c;"></i> for data enthusiasts</p>
+    </footer>
+</body>
+</html>
