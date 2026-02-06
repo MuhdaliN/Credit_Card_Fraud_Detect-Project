@@ -1,0 +1,9 @@
+Django>=4.2
+djangorestframework
+numpy
+pandas
+scikit-learn
+joblib
+matplotlib
+seaborn
+python-dateutil
